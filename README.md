@@ -60,6 +60,7 @@ C) Left: run script show_cellsConnectHex.m; Right: show_cellsInitC_Hex.m
 Figure 3
 A) Same data as in Fig 1 C (disi.mat) but scaled by isi_L(1); Freq=isi_L(1)/(isi_L(j)), for j=1,3,5,7,9,11,13,15,18
 B) In ~/thry/, run plot_P_Hs.m
+C) In ~/thry/, run plot_circ_chains.m
 
 Figure 4
 Use the script ~/thry/plotHfcn_suffCondit_hex.m and input the corresponding network type (Het, Homog C, Homog P), 
