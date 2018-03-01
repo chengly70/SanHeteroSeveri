@@ -17,7 +17,6 @@ s3=constant gap strength throughout.
 g2=0.25nS ([0.5/15,0.5]nS range of g_gap when gradient gap strength s1&s2), g22=0.625nS ([1.25/15,1.25]nS range with gradient gap), g3=1nS ([2/15,2]nS range with gradient gap), g33=1.5nS ([3/15,3]nS range with gradient gap), g4=2nS ([4/15,4]nS range with gradient gap)
 
 thry/ - theory; coupled oscillator models, contains files to implement the phase reduction model.  See 1README.txt in that directory
-xpp_files — sa_Int_jth.ode, contains implementation of uncoupled Severi model in XPP to calculate the interaction (H) functions (see file for further details)
 
 
 Main Files for Severi Model:     
