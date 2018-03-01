@@ -1,6 +1,9 @@
+
 Describing sub-directory ~/thry/ that has model/methods for 
 reduced 1D chain of oscillators with cut-end (nearest neighbor coupling) approximation to the full 2D coupled Severi Model
 
+
+The H functions are calculated in XPP via the file: sa_Int_jth.ode; results are saved Hfs.mat
 
 Primary M-files:
 
