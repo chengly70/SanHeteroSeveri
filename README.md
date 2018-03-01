@@ -5,8 +5,7 @@ DOI:
 
 We do not describe every m-file or sub-function because there are too many, rather we only describe the most pertinent files to reproduce our models and figures in the paper.
 
-Sub-directories:
-
+Sub-directories:    
 runs_Hex/ — contains example scripts that were run for the full coupled Severi model of 271 cells; for 20s of simulation, takes a very long time (shorten time [line 58, tspan] to shorten run time)
 !!must be moved to the main directory to run (relies on many .m and .mat files)!!
 Naming convention follows: Hex[_Het/HomC/HomP]_[io/oi]_g[2/22/3/33/4]_s[1/2/3].m; Het is with all cell types (heterogeneous), HomC 
@@ -21,14 +20,14 @@ thry/ - theory; coupled oscillator models, contains files to implement the phase
 xpp_files — sa_Int_jth.ode, contains implementation of uncoupled Severi model in XPP to calculate the interaction (H) functions (see file for further details)
 
 
-Main Files for Severi Model:
+Main Files for Severi Model:     
 SA_fcn_Het.m — the main ODE file (right-hand-side) to implement the Severi Model, with 31 dynamic variables.  
 Input parameters: (t,y) usual ODE, t=time, y=state variable (31*Nz sized vector). Nz=total # pacemaker cells, G_cup=gap junctional coupling matrix; 
 the next 12 inputs are intrinsic cellular parameters to give heterogeneity, each is an Nz x 1 vector: 
 C,Lcell,Rcell,gfNa,gfK,PCaL,PCaT,gKr,gKs,gNa,INaKmax,KNaCa
 SA_fun_Interm.m — for running a single Severi cell model, much like Severi et al. ’12 BUT allows heterog in the 12 parameters we varied
 
-Mat Files:
+Mat Files:     
 disi.mat — contains variable isi_L that is an 18 x 1 vector of the cycle lengths (CL) or interspike internal (ISI), in seconds.  Calculated by running the model and using the function get_isiL.m AFTER running SA_Model_Int_Plots.m (SA_fun_Interm.m) and inputting (tm,Volt) and threshold for spiking
 Parms_c2p.mat — contains heterogeneous parameter values of all 18 cell types; variables: C,Lcell,Rcell,gfNa,gfK,PCaL,PCaT,gKr,gKs,gNa,INaKmax,KNaCa, 
 each of size 18 x 1.  Also has scl_vl and iv_scl which are 18 x 1 vectors to denote how parameters were linearly interpolated between Center 
