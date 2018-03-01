@@ -6,6 +6,7 @@ DOI:
 We do not describe every m-file or sub-function because there are too many, rather we only describe the most pertinent files to reproduce our models and figures in the paper.
 
 Sub-directories:
+
 runs_Hex/ — contains example scripts that were run for the full coupled Severi model of 271 cells; for 20s of simulation, takes a very long time (shorten time [line 58, tspan] to shorten run time)
 !!must be moved to the main directory to run (relies on many .m and .mat files)!!
 Naming convention follows: Hex[_Het/HomC/HomP]_[io/oi]_g[2/22/3/33/4]_s[1/2/3].m; Het is with all cell types (heterogeneous), HomC 
