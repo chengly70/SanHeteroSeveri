@@ -1,0 +1,247 @@
+# SA model from Severi et al 2012, DOI: 10.1113/jphysiol.2012.229435
+# altered so can load 18 parameter sets (Center<->Peripheral) using jth param \in [1,10]
+# MUST change both jth param AND change to appropriate set (on,ona,..,ten) to change INaKmax,KNaCa values
+
+param jth=1
+scval=(jth-1)/9
+C=3.2e-5*(1-scval)+6.5e-5*scval
+Lcell=70*(1-scval)+86*scval
+Rcell=4*(1-scval)+6*scval
+gfNa=0.03*(1-scval)+0.378*scval
+gfK=0.03*(1-scval)+0.378*scval
+PCaL=0.2*(1-scval)+2.28*scval
+PCaT=0.02*(1-scval)+0.064*scval
+gKr=0.0021637*(1-scval)+0.0108185*scval
+gKs=0.0016576*(1-scval)+0.008288*scval
+gNa=0.0125*(1-scval)+0.25*scval
+set on {INaKmax=0.063, KNaCa=4}
+set ona {INaKmax=0.0655, KNaCa=4.4}
+set onb {INaKmax=0.0695, KNaCa=6}
+set onc {INaKmax=0.0735, KNaCa=5.7}
+set ond {INaKmax=0.08, KNaCa=6.7}
+set tw {INaKmax=0.09, KNaCa=9}
+set twa {INaKmax=0.095, KNaCa=8.9}
+set twb {INaKmax=0.107, KNaCa=10.3}
+set tr {INaKmax=0.125, KNaCa=13.5}
+set tra {INaKmax=0.138, KNaCa=13.7}
+set for {INaKmax=0.164, KNaCa=17}
+set fora {INaKmax=0.1785, KNaCa=17.7}
+set five {INaKmax=0.2045, KNaCa=21}
+set six {INaKmax=0.245, KNaCa=25}
+set sev {INaKmax=0.2871, KNaCa=29}
+set eigt {INaKmax=0.3285, KNaCa=33}
+set nine {INaKmax=0.369, KNaCa=36}
+set ten {INaKmax=0.4095, KNaCa=40}
+Lsub=0.02
+Vipart=0.46
+VjSRpart=0.0012
+VnSRpart=0.0116
+Vcell=pi*Rcell^2*Lcell*1e-9
+Vsub=1e-9*2*pi*Lsub*(Rcell-Lsub/2)*Lcell
+Vi=Vipart*Vcell-Vsub
+VjSR=VjSRpart*Vcell
+VnSR=VnSRpart*Vcell
+Ki=140
+Ko=5.4
+Nao=140
+Cao=1.8
+Mgi=2.5
+param ACh=0
+F=96485.3415
+RTONF=8314.472*310/96485.3415
+EK=RTONF*ln(Ko/Ki)
+gKACh=0.00864
+gto=0.002
+param INaKmax=0.063, KNaCa=4
+KmKp=1.4
+KmNap=14
+K1ni=395.3
+K1no=1628
+K2ni=2.289
+K2no=561.4
+K3ni=26.44
+K3no=4.663
+Kci=0.0207
+Kcni=26.44
+Kco=3.663
+Qci=0.1369
+Qco=0
+Qn=0.4315
+taudifCa=0.00004
+tautr=0.04
+Kup=0.0006
+Pup=12
+kiCa=500
+kim=5
+koCa=10000
+kom=60
+ks=25e7
+EC50SR=0.45
+HSR=2.5
+MaxSR=15
+MinSR=1
+CMtot=0.045
+CQtot=10
+TCtot=0.031
+TMCtot=0.062
+kbCM=542
+kbCQ=445
+kbTC=446
+kbTMC=7.51
+kbTMM=751
+kfCM=227700
+kfCQ=534
+kfTC=88800
+kfTMC=227700
+kfTMM=2277
+Kmf=45
+#functions (aux)
+ENa(Nai)=RTONF*ln(Nao/Nai)
+ECa(Casub)=.5*RTONF*ln(Cao/Casub)
+IfNa(v,yf,Nai)=gfNa*(yf^2*Ko)/(Ko+Kmf)*(v-ENa(Nai))
+IfK(v,yf)=gfK*(yf^2*Ko)/(Ko+Kmf)*(v-EK)
+IfCurr(v,yf)=IfNa(v,yf,Nai)+IfK(v,yf)
+IsiCa(v,Casub,dL,fL,fCa)=(2*PCaL*v)/(RTONF*(1-exp((-2*v)/RTONF)))*(Casub-Cao*exp((-2*v)/RTONF))*dL*fL*fCa
+IsiK(v,dL,fL,fCa)=(0.000365*PCaL*v)/(RTONF*(1-exp(-v/RTONF)))*(Ki-Ko*exp(-v/RTONF))*dL*fL*fCa
+IsiNa(v,Nai,dL,fL,fCa)=(0.0000185*PCaL*v)/(RTONF*(1-exp(-v/RTONF))*(Nai-Nao*exp(-v/RTONF)))*dL*fL*fCa
+ICaL(v,Casub,Nai,dL,fL,fCa)=IsiCa(v,Casub,dL,fL,fCa)+IsiK(v,dL,fL,fCa)+IsiNa(v,Nai,dL,fL,fCa)
+ICaT(v,Casub,dTvar,fT)=(2*PCaT*v)/(RTONF*(1-exp(-2*v/RTONF)))*(Casub-Cao*exp(-2*v/RTONF))*dTvar*fT
+IKr(v,paF,paS,PiVar)=gKr*(v-EK)*(0.9*paF+0.1*paS)*PiVar
+#IKs(v,n)=gKs*(v-EK)*n^2
+IKACh(v,a)=if(ACh>0)then(gKACh*(v-EK)*(1+exp((v+20)/20))*a)else(0)
+Ito(v,q,r)=gKs*(v-EK)*q*r
+Emh(Nai)=RTONF*ln((Nao+0.12*Ko)/(Nai+0.12*Ki))
+INa(v,m,h,Nai)=gNa*m^3*h*(v-Emh(Nai))
+INaK(v,Nai)=INaKmax/( (1+(KmKp/Ko)^1.2)*(1+(KmNap/Nai)^1.3)*(1+exp(-(v-ENa(Nai)+110)/20)) )
+di(v,Casub,Nai)=1+(Casub/Kci)*(1+exp(-Qci*v/RTONF)+Nai/Kcni)+(Nai/K1ni)*(1+(Nai/K2ni)*(1+Nai/K3ni))
+do(v)=1+Cao/Kco*(1+exp(Qco*v/RTONF))+Nao/K1no*(1+Nao/K2no*(1+Nao/K3no))
+k12(v,Casub,Nai)=(Casub/Kci)*exp(-Qci*v/RTONF)/di(v,Casub,Nai)
+k14(v,Casub,Nai)=(((Nai/K1ni*Nai)/K2ni)*(1+Nai/K3ni)*exp(Qn*v/(2*RTONF)))/di(v,Casub,Nai)
+k21(v)=((Cao/Kco)*exp(Qco*v/RTONF))/do(v)
+k23(v)=(((Nao/K1no*Nao)/K2no)*(1+Nao/K3no)*exp(-Qn*v/(2*RTONF)))/do(v)
+k32(v)=exp(Qn*v/(2*RTONF))
+k34=Nao/(K3no+Nao)
+k41(v)=exp(-Qn*v/(2*RTONF))
+k43(Nai)=Nai/(K3ni+Nai)
+x1(v,Nai)=k41(v)*k34*(k23(v)+k21(v))+k21(v)*k32(v)*(k43(Nai)+k41(v))
+x2(v,Casub,Nai)=k32(v)*k43(Nai)*(k14(v,Casub,Nai)+k12(v,Casub,Nai))+k41(v)*k12(v,Casub,Nai)*(k34+k32(v))
+x3(v,Casub,Nai)=k14(v,Casub,Nai)*k43(Nai)*(k23(v)+k21(v))+k12(v,Casub,Nai)*k23(v)*(k43(Nai)+k41(v))
+x4(v,Casub,Nai)=k23(v)*k34*(k14(v,Casub,Nai)+k12(v,Casub,Nai))+k14(v,Casub,Nai)*k21(v)*(k34+k32(v))
+INaCa(v,Casub,Nai)=(KNaCa*(x2(v,Casub,Nai)*k21(v)-x1(v,Nai)*k12(v,Casub,Nai)))/(x1(v,Nai)+x2(v,Casub,Nai)+x3(v,Casub,Nai)+x4(v,Casub,Nai))
+Jrel(Ocap,Cajsr,Casub)=ks*Ocap*(Cajsr-Casub)
+kCaSR(Cajsr)=MaxSR-(MaxSR-MinSR)/(1+(EC50SR/Cajsr)^HSR)
+koSRCa(Cajsr)=koCa/kCaSR(Cajsr)
+kiSRCa(Cajsr)=kiCa*kCaSR(Cajsr)
+Jdiff(Casub,Cai)=(Casub-Cai)/taudifCa
+Jtr(Cansr,Cajsr)=(Cansr-Cajsr)/tautr
+Jup(Cai)=Pup/(1+Kup/Cai)
+deltafCMi(Cai,fCMi)=kfCM*Cai*(1-fCMi)-kbCM*fCMi
+deltafCMs(Casub,fCMs)=kfCM*Casub*(1-fCMs)-kbCM*fCMs
+deltafCQ(Cajsr,fCQ)=kfCQ*Cajsr*(1-fCQ)-kbCQ*fCQ
+deltafTC(Cai,fTC)=kfTC*Cai*(1-fTC)-kbTC*fTC
+deltafTMC(Cai,fTMC,fTMM)=kfTMC*Cai*(1-(fTMC+fTMM))-kbTMC*fTMC
+#deltafTMM(fTMC,fTMM)=kfTMM*Mgi*(1-(fTMC+fTMM))-kbTMM*fTMM
+
+#yfss(v)=1/(1+exp((v+52.5)/9))
+#tauyf(v)=0.7/(0.0708*exp(-(v+5)/20.28)+10.6*exp(v/18))
+#dLss(v)=1/(1+exp(-(v+20.3)/4.2))
+adL(v)=(-0.02839*(v+41.8))/(exp(-(v+41.8)/2.5)-1)-(0.0849*(v+6.8))/(exp(-(v+6.8)/4.8)-1)
+bdL(v)=(0.01143*(v+1.8))/(exp((v+1.8)/2.5)-1)
+taudL(v)=0.001/(adL(v)+bdL(v))
+#fLss(v)=1/(1+exp((v+37.4)/5.3))
+#taufL(v)=0.001*(44.3+230*exp(-((v+36)/10)^2))
+#fCass(Casub)=0.00035/(0.00035+Casub)
+#taufCa(Casub)=0.001*fCass(Casub)/0.01
+#dTss(v)=1/(1+exp(-(v+38.3)/5.5))
+#taudT(v)=0.001/(1.068*exp((v+38.3)/30)+1.068*exp(-(v+38.3)/30))
+#fTss(v)=1/(1+exp((v+58.7)/3.8))
+#taufT(v)=1/(16.67*exp(-(v+75)/83.3)+16.67*exp((v+75)/15.38))
+#pass(v)=1/(1 + exp(-(v+14.8)/8.5))
+#taupaF(v)=1/(30*exp(v/10)+exp(-v/12))
+#taupaS(v)=0.84655/(4.2*exp(v/17)+0.15*exp(-v/21.6))
+#Piss(v)=1/(1+exp((v+28.6)/17.1))
+#tauPi(v)=1/(100*exp(-v/54.645)+656*exp(v/106.157))
+#nss(v)=(14/(1+exp(-(v-40)/9)))/(14/(1+exp(-(v-40)/9)) + exp(-v/45))
+#taun(v)=1/(28/(1+exp(-(v-40)/3))+exp(-(v-5)/25))
+achPart(ACh)=(3.5988-0.0256)/(1+(0.0000012155/(ACh^1.6951)))+0.0256
+#ass(v)=achPart(ACh)/(achPart(ACh)+10*exp(0.0133*(v+40)))
+#taua(v)=1/(achPart(ACh)+10*exp(0.0133*(v+40)))
+#qss(v)=1/(1+exp((v+49)/13))
+#tauq(v)=0.001*0.6*(65.17/(0.57*exp(-0.08*(v+44))+0.065*exp(0.1*(v+45.93)))+10.1)
+#rss(v)=1/(1+exp(-(v-19.3)/15))
+#taur(v)=0.001*0.66*1.4*(15.59/(1.037*exp(0.09*(v+30.61))+0.369*exp(-0.12*(v+23.84)))+2.98)
+am(v)=if(abs(v+41)<1e-5)then(2000)else((200*(v+41))/(1-exp(-0.1*(v+41))))
+#bm(v)=8000*exp(-0.056*(v+66))
+#ah(v)=20*exp(-0.125*(v+75))
+#bh(v)=2000/(320*exp((-0.1)*(v+75))+1)
+
+%the ODEs for the 31 state variables
+v'=-(INa(v,m,h,Nai)+IfCurr(v,yf)+Ito(v,q,r)+ICaL(v,Casub,Nai,dL,fL,fCa)+ICaT(v,Casub,dTvar,fT)+IKr(v,paF,paS,PiVar)+gKs*(v-EK)*n^2+IKACh(v,a)+INaK(v,Nai)+INaCa(v,Casub,Nai))/c
+yf'=(1/(1+exp((v+52.5)/9))-yf)/(0.7/(0.0708*exp(-(v+5)/20.28)+10.6*exp(v/18)))
+dL'=(1/(1+exp(-(v+20.3)/4.2))-dL)/taudL(v)
+fL'=(1/(1+exp((v+37.4)/5.3))-fL)/(0.001*(44.3+230*exp(-((v+36)/10)^2)))
+fCa'=(0.00035/(0.00035+Casub)-fCa)/(0.000035/(0.00035+Casub))
+dTvar'=(1/(1+exp(-(v+38.3)/5.5))-dTvar)/(0.001/(1.068*exp((v+38.3)/30)+1.068*exp(-(v+38.3)/30)))
+fT'=(1/(1+exp((v+58.7)/3.8))-fT)/(1/(16.67*exp(-(v+75)/83.3)+16.67*exp((v+75)/15.38)))
+paF'=(1/(1 + exp(-(v+14.8)/8.5))-paF)/(1/(30*exp(v/10)+exp(-v/12)))
+paS'=(1/(1 + exp(-(v+14.8)/8.5))-paS)/(0.84655/(4.2*exp(v/17)+0.15*exp(-v/21.6)))
+PiVar'=(1/(1+exp((v+28.6)/17.1))-PiVar)/(1/(100*exp(-v/54.645)+656*exp(v/106.157)))
+n'=(((14/(1+exp(-(v-40)/9)))/(14/(1+exp(-(v-40)/9)) + exp(-v/45)))-n)/(1/(28/(1+exp(-(v-40)/3))+exp(-(v-5)/25)))
+a'=((achPart(ACh)/(achPart(ACh)+10*exp(0.0133*(v+40))))-a)/(1/(achPart(ACh)+10*exp(0.0133*(v+40))))
+q'=((1/(1+exp((v+49)/13)))-q)/(0.001*0.6*(65.17/(0.57*exp(-0.08*(v+44))+0.065*exp(0.1*(v+45.93)))+10.1))
+r'=((1/(1+exp(-(v-19.3)/15)))-r)/(0.001*0.66*1.4*(15.59/(1.037*exp(0.09*(v+30.61))+0.369*exp(-0.12*(v+23.84)))+2.98))
+m'=am(v)*(1-m)-(8000*exp(-0.056*(v+66)))*m
+h'=(20*exp(-0.125*(v+75)))*(1-h)-(2000/(320*exp(-0.1*(v+75))+1))*h
+Rcap'=kim*RI-kiSRCa(Cajsr)*Casub*Rcap-(koSRCa(Cajsr)*Casub^2*Rcap-kom*Ocap)
+Ocap'=koSRCa(Cajsr)*Casub^2*Rcap-kom*Ocap-(kiSRCa(Cajsr)*Casub*Ocap-kim*Icap)
+Icap'=kiSRCa(Cajsr)*Casub*Ocap-kim*Icap-(kom*Icap-koSRCa(Cajsr)*Casub^2*RI)
+RI'=kom*Icap-koSRCa(Cajsr)*Casub^2*RI-(kim*RI-kiSRCa(Cajsr)*Casub*Rcap )
+fCMi'=deltafCMi(Cai,fCMi)
+fCMs'=deltafCMs(Casub,fCMs)
+fCQ'=deltafCQ(Cajsr,fCQ)
+fTC'=deltafTC(Cai,fTC)
+fTMC'=deltafTMC(Cai,fTMC,fTMM)
+fTMM'=kfTMM*Mgi*(1-(fTMC+fTMM))-kbTMM*fTMM
+Cai'=(Jdiff(Casub,Cai)*Vsub-Jup(Cai)*VnSR)/Vi-(CMtot*deltafCMi(Cai,fCMi)+TCtot*deltafTC(Cai,fTC)+TMCtot*deltafTMC(Cai,fTMC,fTMM))
+Casub'=Jrel(Ocap,Cajsr,Casub)*VjSR/Vsub-((IsiCa(v,Casub,dL,fL,fCa)+ICaT(v,Casub,dTvar,fT)-2*INaCa(v,Casub,Nai))/(2*F*Vsub)+Jdiff(Casub,Cai)+CMtot*deltafCMs(Casub,fCMs))
+Cansr'=Jup(Cai)-Jtr(Cansr,Cajsr)*VjSR/VnSR
+Cajsr'=Jtr(Cansr,Cajsr)-(Jrel(Ocap,Cajsr,Casub)+CQtot*deltafCQ(Cajsr,fCQ))
+Nai'=-(INa(v,m,h,Nai)+IfNa(v,yf,Nai)+IsiNa(v,Nai,dL,fL,fCa)+3*INaK(v,Nai)+3*INaCa(v,Casub,Nai))/((Vi+Vsub)*F)
+
+
+v(0)=-67.7639
+yf(0)=0.0425
+dL(0)=1.2484e-05
+fL(0)=0.4128
+fCa(0)=0.5511
+dTvar(0)=0.0047
+fT(0)=0.4971
+paF(0)=0.0097
+paS(0)=0.8404
+PiVar(0)=0.9078
+n(0)=0.1711
+a(0)=0.0018
+q(0)=0.5322
+r(0)=0.0031
+m(0)=0.0429
+h(0)=0.1002
+Rcap(0)=0.7010
+Ocap(0)=2.207e-07
+Icap(0)=0.1331e-06
+RI(0)=0.4225
+fCMi(0)=0.0607
+fCMs(0)=0.0168
+fCQ(0)=0.1294
+fTC(0)=0.0298
+fTMC(0)=0.4478
+fTMM(0)=0.4877
+Cai(0)=0.1515e-03
+Casub(0)=0.04e-03
+Cansr(0)=1.3589
+Cajsr(0)=0.1285
+Nai(0)=7.406
+
+# track some currents?
+@ xp=t yp=v, xlo=0, xhi=2, ylo=-60, yhi=30, bounds=10000000, maxstor=2000000, total=2, dt=1e-5, meth=qualrk
+
+done 
