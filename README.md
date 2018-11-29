@@ -1,7 +1,7 @@
 This directory contains Matlab & XPP program files to implement the models and methods of sinoatrial node pacemaker cells coupled in a large network on 2D hexagonal grid.
 
-Citation: Ly & Weinberg (2018). Analysis of Heterogeneous Cardiac Pacemaker Cell Models and Traveling Wave Dynamics. xx, xx 
-DOI: 
+Citation: Ly & Weinberg (2018). Analysis of Heterogeneous Cardiac Pacemaker Cell Models and Traveling Wave Dynamics. Journal of Theoretical Biology (459): 18-35.
+DOI: 10.1016/j.jtbi.2018.09.023
 
 We do not describe every m-file or sub-function because there are too many, rather we only describe the most pertinent files to reproduce our models and figures in the paper.
 
